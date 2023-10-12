@@ -3,6 +3,7 @@ export interface MovieEntity {
     Title: string;
     Description: string;
     ReleaseDate: Date | undefined;
+    CoverUrl: string | undefined;
 }
 
 export interface SearchMoviesResponse {

@@ -16,7 +16,8 @@ export const searchMovies = createAsyncThunk<
             Id: movie.id,
             Description: '',
             Title: movie.titleText.text,
-            ReleaseDate: movie.releaseDate ? new Date(movie.releaseDate.year, movie.releaseDate.month, movie.releaseDate.day) : undefined
+            ReleaseDate: movie.releaseDate ? new Date(movie.releaseDate.year, movie.releaseDate.month, movie.releaseDate.day) : undefined,
+            CoverUrl: movie.primaryImage ? movie.primaryImage.url : undefined
         } as MovieEntity;
     });
 });

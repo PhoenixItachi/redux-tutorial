@@ -4,11 +4,15 @@ import { useAppDispatch } from "../../store";
 import { searchMovies } from "../../store/thunks";
 import { useSelector } from "react-redux";
 import { selectIsSearchingMovies, selectSearchMovies } from "../../store/selectors";
-import { addMovie } from "../../store/slices/movieSlice";
+import { addMovie, deleteMovie } from "../../store/slices/movieSlice";
 import { selectMovies } from "../../store/selectors/movieSelectors";
-import { Box, Button, Card, CardActions, CardContent, CircularProgress, Container, FormControlLabel, Grid, Switch, TextField, Typography } from "@mui/material";
+import { Box, Button, CardActions, CircularProgress, Container, FormControlLabel, Grid, IconButton, Switch, TextField, Typography } from "@mui/material";
+
+// Icons
 import Movie from "@mui/icons-material/LiveTv";
-import { formatDate } from "../../utils/helpers";
+import DeleteIcon from '@mui/icons-material/Delete';
+import { MovieCard } from "../../components/movieCard";
+import { DeleteMovieDialog } from "../../components/deleteMovieDialog";
 
 export const HomePage: FC = () => {
     const dispatch = useAppDispatch();
@@ -20,6 +24,9 @@ export const HomePage: FC = () => {
 
     const [searchTitle, setSearchTitle] = useState<string>("");
     const [exact, setExact] = useState<boolean>(false);
+
+    const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
+    const [deleteMovieId, setDeleteMovieId] = useState<string>();
 
     useEffect(() => {
         if (searchTitle) onSearchMovie();
@@ -39,6 +46,16 @@ export const HomePage: FC = () => {
             onSearchMovie();
         };
     };
+
+    const onOpenDeleteModal = (movieId: string) => {
+        setDeleteMovieId(movieId);
+        setDeleteModalOpen(true);
+    }
+
+    const onDeleteMovie = () => {
+        if (deleteMovieId)
+            dispatch(deleteMovie({ movieId: deleteMovieId }));
+    }
 
     return (
         <Box height={"100vh"} width={1} bgcolor="background.default" className="App">
@@ -65,23 +82,15 @@ export const HomePage: FC = () => {
 
                     <Grid container spacing={2}>
                         {!isSearchingMovies && searchedMovies.map((movie) => (
-                            <Grid item xs={12} md={6}>
-                                <Card key={movie.Id}>
-                                    <CardContent>
-                                        <Typography>
-                                            {movie.Title}
-                                        </Typography>
-
-                                        {movie.ReleaseDate &&
-                                            <Typography variant="caption" color="text.secondary">
-                                                {formatDate(movie.ReleaseDate)}
-                                            </Typography>
-                                        }
-                                    </CardContent>
-                                    <CardActions>
-                                        <Button size="small" onClick={() => onAddToCollection(movie.Id)}>Add to Collection</Button>
-                                    </CardActions>
-                                </Card>
+                            <Grid item xs={12} md={6} key={movie.Id}>
+                                <MovieCard
+                                    movie={movie}
+                                    actions={
+                                        <CardActions>
+                                            <Button size="small" onClick={() => onAddToCollection(movie.Id)}>Add to Collection</Button>
+                                        </CardActions>
+                                    }
+                                />
                             </Grid>
                         ))}
                     </Grid>
@@ -91,26 +100,31 @@ export const HomePage: FC = () => {
                         My Collection:
                     </Typography>
                     <Grid container spacing={2}>
-                        {myMoviesCollection.map((movie) => (
-                            <Grid item xs={12} md={6}>
-                                <Card key={movie.Id}>
-                                    <CardContent>
-                                        <Typography>
-                                            {movie.Title}
-                                        </Typography>
+                        {myMoviesCollection.length === 0 &&
+                            <Grid item xs={12}>
+                                <Typography textAlign={"center"}>Your collection is empty</Typography>
+                            </Grid>
+                        }
 
-                                        {movie.ReleaseDate &&
-                                            <Typography variant="caption" color="text.secondary">
-                                                {formatDate(movie.ReleaseDate)}
-                                            </Typography>
-                                        }
-                                    </CardContent>
-                                </Card>
+                        {myMoviesCollection.map((movie) => (
+                            <Grid item xs={12} md={6} key={movie.Id}>
+                                <MovieCard
+                                    movie={movie}
+                                    actions={
+                                        <CardActions>
+                                            <IconButton color="error" onClick={() => onOpenDeleteModal(movie.Id)}>
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </CardActions>
+                                    }
+                                />
                             </Grid>
                         ))}
                     </Grid>
                 </Box>
             </Container>
+
+            <DeleteMovieDialog open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} onDelete={onDeleteMovie} />
         </Box>
     );
 }
