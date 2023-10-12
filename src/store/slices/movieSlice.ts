@@ -15,9 +15,6 @@ export const moviesSlice = createSlice({
     reducers: {
         addMovie: (state, { payload }: { payload: MovieEntity }) => {
             if (state.movies.some(m => m.Id === payload.Id)) return;
-
-            const currentState = [...state.movies];
-
             state.movies.push(payload);
         },
         addMovies: (state, { payload }: { payload: MovieEntity[] }) => {
