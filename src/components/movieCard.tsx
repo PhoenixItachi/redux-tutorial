@@ -1,8 +1,7 @@
 import { FC, ReactElement } from "react";
 import { MovieEntity, formatDate } from "../utils";
-import { Box, Card, CardActions, CardContent, IconButton, Typography } from "@mui/material";
+import { Box, Card, CardContent, Typography } from "@mui/material";
 import { MovieCover } from "./movieCoves";
-import DeleteIcon from '@mui/icons-material/Delete';
 
 interface MovieCardProps {
     movie: MovieEntity;
